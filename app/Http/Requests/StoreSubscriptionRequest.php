@@ -26,12 +26,12 @@ class StoreSubscriptionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'cardNo'      => ['required' => new CardNumber],
-            'cardOwner'   => ['required'],
-            'expireMonth' => ['required', new CardExpirationYear($this->get('expireMonth'))],
-            'expireYear'  => ['required', new CardExpirationMonth($this->get('expireYear'))],
-            'cvv'         => ['required', new CardCvc($this->get('card_number'))],
-            'packageId',
+            'cardNo'                => ['required', new CardNumber],
+            'cardOwner'             => ['required'],
+            'expireMonth'           => ['required', new CardExpirationMonth($this->get('expireYear'))],
+            'expireYear'            => ['required', new CardExpirationYear($this->get('expireMonth'))],
+            'cvv'                   => ['required', new CardCvc($this->get('cardNo'))],
+            'subscriberPhoneNumber' => ['required'],
         ];
     }
 }

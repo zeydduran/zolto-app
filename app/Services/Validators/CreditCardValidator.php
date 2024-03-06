@@ -14,11 +14,14 @@ class CreditCardValidator implements ValidationContract
     public static function validate(array $params): bool
     {
         $validator = Validator::make($params, [
-            'cardNo'      => ['required' => new CardNumber],
-            'cardOwner'   => ['required'],
-            'expireYear'  => ['required', new CardExpirationYear($params["expireMonth"])],
-            'expireMonth' => ['required', new CardExpirationMonth($params["expireYear"])],
-            'cvv'         => ['required', new CardCvc($params["cardNo"])],
+            'cardNo'                => ['required', 'string', new CardNumber],
+            'cardOwner'             => ['required', 'string'],
+            'expireYear'            => ['required', 'string', new CardExpirationYear($params["expireMonth"])],
+            'expireMonth'           => ['required', 'string', new CardExpirationMonth($params["expireYear"])],
+            'cvv'                   => ['required', 'string', new CardCvc($params["cardNo"])],
+            'subscriberPhoneNumber' => ['required', 'string'],
+            'packageId'             => ['required', 'string'],
+            'subscriberId'         => ['required', 'string', 'exists:subscriptions,subscriber_id'],
         ]);
 
         if ($validator->fails()) {

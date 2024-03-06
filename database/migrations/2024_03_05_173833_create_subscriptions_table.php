@@ -12,7 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('subscriptions', function (Blueprint $table) {
-            $table->id();
+            $table->enum('status', ['active', 'inactive'])->nullable();
+            $table->uuid('subscriber_id')->unique();
+            $table->dateTime('start_date')->nullable();
+            $table->dateTime('expire_date')->nullable();
+            $table->string('phone_number');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->timestamps();
         });
     }

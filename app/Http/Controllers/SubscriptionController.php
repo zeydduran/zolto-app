@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreSubscriptionRequest;
 use App\Http\Requests\UpdateSubscriptionRequest;
 use App\Models\Subscription;
+use App\Services\Facades\ZotloService;
 
 class SubscriptionController extends Controller
 {
@@ -28,7 +29,21 @@ class SubscriptionController extends Controller
      */
     public function store(StoreSubscriptionRequest $request)
     {
-        //
+
+        $user = $request->user()->loadCount(['subscriptions' => function ($query) {
+            $query->where('status', 'active');
+        }]);
+        if ($user->subscriptions_count <= 0) {
+            $subscription =  $user->subscriptions()->create([
+                'phone_number' => $request->input('subscriberPhoneNumber'),
+            ]);
+            $params = $request->all();
+            $params["subscriberId"] = $subscription->subscriber_id;
+            $payment =  ZotloService::payment()->creditCard($params);
+            dd($payment->getResult());
+        } else {
+            return response()->json(['status' => false], 403);
+        }
     }
 
     /**
