@@ -6,6 +6,7 @@ use App\Http\Requests\StoreSubscriptionRequest;
 use App\Http\Requests\UpdateSubscriptionRequest;
 use App\Models\Subscription;
 use App\Services\Facades\ZotloService;
+use App\Services\Responses\Profile;
 
 class SubscriptionController extends Controller
 {
@@ -41,7 +42,10 @@ class SubscriptionController extends Controller
             $params["subscriberId"] = $subscription->subscriber_id;
             $payment =  ZotloService::payment()->creditCard($params);
             if ($payment->isSuccess()) {
-                dd($payment->getProfile());
+                /** @var Profile $profile */
+                $profile = $payment->getProfile();
+                $subscription->start_date = $profile->startDate;
+                $subscription->save();
             } else {
                 return response()->json([
                     'errorCode' => $payment->getErrorCode(),

@@ -61,7 +61,7 @@ class ZotloResponse
         return $this->meta['errorMessage'] ?? null;
     }
 
-    public function __call($method, $arguments)
+    public function __call($method, $arguments): mixed
     {
         if (strpos($method, 'get') === 0 && property_exists($this, 'result')) {
             $property = lcfirst(substr($method, 3));
@@ -69,7 +69,9 @@ class ZotloResponse
             if (is_object($this->result[$property]) && isset($this->result[$property])) {
                 return $this->result[$property];
             }
-            throw new \BadMethodCallException("Method {$method} does not exist.");
+            throw new \BadFunctionCallException("Property {$property} does not exist.");
         }
+        throw new \BadFunctionCallException("Method {$method} does not exist.");
+
     }
 }
