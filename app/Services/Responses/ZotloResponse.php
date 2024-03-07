@@ -60,4 +60,16 @@ class ZotloResponse
     {
         return $this->meta['errorMessage'] ?? null;
     }
+
+    public function __call($method, $arguments)
+    {
+        if (strpos($method, 'get') === 0 && property_exists($this, 'result')) {
+            $property = lcfirst(substr($method, 3));
+
+            if (is_object($this->result[$property]) && isset($this->result[$property])) {
+                return $this->result[$property];
+            }
+            throw new \BadMethodCallException("Method {$method} does not exist.");
+        }
+    }
 }
