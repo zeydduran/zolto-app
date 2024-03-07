@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateSubscriptionRequest;
 use App\Models\Subscription;
 use App\Services\Facades\ZotloService;
 use App\Services\Responses\Profile;
+use Illuminate\Support\Str;
 
 class SubscriptionController extends Controller
 {
@@ -35,17 +36,21 @@ class SubscriptionController extends Controller
             $query->where('status', 'active');
         }]);
         if ($user->subscriptions_count <= 0) {
-            $subscription =  $user->subscriptions()->create([
-                'phone_number' => $request->input('subscriberPhoneNumber'),
-            ]);
+            $subscriptionId = Str::uuid();
             $params = $request->all();
-            $params["subscriberId"] = $subscription->subscriber_id;
+            $params["subscriberId"] = (string) $subscriptionId;
             $payment =  ZotloService::payment()->creditCard($params);
             if ($payment->isSuccess()) {
                 /** @var Profile $profile */
                 $profile = $payment->getProfile();
-                $subscription->start_date = $profile->startDate;
-                $subscription->save();
+                $user->subscriptions()->create([
+                    'subscription_id' => (string) $subscriptionId,
+                    'phone_number' => $request->input('subscriberPhoneNumber'),
+                    'start_date'   => $profile->startDate,
+                    'expire_date'  => $profile->expireDate,
+                    'status'       => $profile->realStatus,
+                ]);
+                return response()->json(['status' => true, 'subscription' => $profile], 201);
             } else {
                 return response()->json([
                     'errorCode' => $payment->getErrorCode(),
@@ -53,7 +58,7 @@ class SubscriptionController extends Controller
                 ], 400);
             }
         } else {
-            return response()->json(['status' => false], 403);
+            return response()->json(['errorCode' => 403, 'errorMessage' => trans('Zaten Bir aboneliğiniz mevcut')], 403);
         }
     }
 
@@ -62,7 +67,7 @@ class SubscriptionController extends Controller
      */
     public function show(Subscription $subscription)
     {
-        //
+        return $subscription;
     }
 
     /**

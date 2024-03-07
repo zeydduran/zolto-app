@@ -21,7 +21,7 @@ class CreditCardValidator implements ValidationContract
             'cvv'                   => ['required', 'string', new CardCvc($params["cardNo"])],
             'subscriberPhoneNumber' => ['required', 'string'],
             'packageId'             => ['required', 'string'],
-            'subscriberId'         => ['required', 'string', 'exists:subscriptions,subscriber_id'],
+            'subscriberId'         => ['required', 'string'],
         ]);
 
         if ($validator->fails()) {
