@@ -15,11 +15,9 @@ class PaymentService implements PaymentContract
     {
         CreditCardValidator::validate($params);
         $response = Http::zotlo()->post('/v1/payment/credit-card', $params);
-        if ($response->successful()) {
+        if (in_array($response->status(), [200, 400])) {
             return new ZotloResponse($response->json());
-        } else {
-            // Hata durumunda isteği başarısız olarak işleyebilir veya isteği fırlatabilirsiniz
-            throw new \Exception("Zotlo API request failed: " . $response->status());
         }
+        throw new \Exception("Zotlo API request failed: " . $response->status());
     }
 }

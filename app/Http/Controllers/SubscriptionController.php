@@ -40,7 +40,13 @@ class SubscriptionController extends Controller
             $params = $request->all();
             $params["subscriberId"] = $subscription->subscriber_id;
             $payment =  ZotloService::payment()->creditCard($params);
-            dd($payment->getResult());
+            if ($payment->isSuccess()) {
+            } else {
+                return response()->json([
+                    'errorCode' => $payment->getErrorCode(),
+                    'errorMessage' => $payment->getErrorMessage()
+                ], 400);
+            }
         } else {
             return response()->json(['status' => false], 403);
         }
