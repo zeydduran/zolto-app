@@ -2,7 +2,7 @@
 
 namespace App\Services\Responses;
 
-class ResponseData
+class Response
 {
     public $isSuccess;
     public $transactionId;

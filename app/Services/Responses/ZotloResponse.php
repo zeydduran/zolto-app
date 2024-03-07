@@ -31,25 +31,18 @@ class ZotloResponse
         foreach ($result as $key => $value) {
             $parsedResult[$key] = $this->createObject($key, $value);
         }
-
         return $parsedResult;
     }
 
     private function createObject($key, $value)
     {
-        switch ($key) {
-            case 'profile':
-                return $value !== null ? new Profile($value) : null;
-            case 'package':
-                return $value !== null ? new Package($value) : null;
-            case 'customer':
-                return $value !== null ? new Customer($value) : null;
-            case 'card':
-                return $value !== null ? new Card($value) : null;
-            case 'response':
-                return new ResponseData($value);
-            default:
-                return $value;
+        $className = ucfirst($key);
+
+        $classPath = __DIR__ . DIRECTORY_SEPARATOR . $className . '.php';
+        if (file_exists($classPath) && class_exists("App\Services\Responses\\{$className}")) {
+            return $value !== null ? app("App\Services\Responses\\{$className}", ['data' => $value]) : null;
+        } else {
+            return $value;
         }
     }
 
