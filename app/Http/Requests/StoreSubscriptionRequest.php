@@ -32,6 +32,7 @@ class StoreSubscriptionRequest extends FormRequest
             'expireYear'            => ['required', new CardExpirationYear($this->get('expireMonth'))],
             'cvv'                   => ['required', new CardCvc($this->get('cardNo'))],
             'subscriberPhoneNumber' => ['required'],
+            'packageId'             => ['required', 'string'],
         ];
     }
 }

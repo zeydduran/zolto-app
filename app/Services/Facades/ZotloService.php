@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Facade;
 
 /**
  * @method static \App\Services\PaymentService payment()
+ * @method static \App\Services\SubscriptionService subscription()
  */
 class ZotloService extends Facade
 {

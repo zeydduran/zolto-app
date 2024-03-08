@@ -17,8 +17,10 @@ return new class extends Migration
             $table->dateTime('start_date')->nullable();
             $table->dateTime('expire_date')->nullable();
             $table->string('phone_number');
+            $table->string('packageId');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
