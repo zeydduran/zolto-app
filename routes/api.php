@@ -26,5 +26,9 @@ Route::middleware("auth:sanctum")->group(function () {
         SubscriptionController::class,
         "cancellation",
     ]);
+    Route::post("/subscription/card-list/{subscription}", [
+        SubscriptionController::class,
+        "cardList",
+    ]);
     Route::apiResource("subscription", SubscriptionController::class);
 });

@@ -91,7 +91,7 @@ class SubscriptionController extends Controller
             "zotlo.premium"
         );
         if ($profile instanceof SuccessResponse) {
-            return response()->json($profile, 200);
+            return response()->json($profile->getResult(), 200);
         } else {
             return response()->json(
                 [
@@ -148,6 +148,18 @@ class SubscriptionController extends Controller
             );
         } else {
             return response()->json($cancellation, 400);
+        }
+    }
+
+    public function cardList(Subscription $subscription)
+    {
+        $cardList = ZotloService::subscription()->cardList(
+            $subscription->subscriber_id
+        );
+        if ($cardList instanceof SuccessResponse) {
+            return response()->json($cardList->getResult());
+        }else{
+             return response()->json($cardList, 400);
         }
     }
 }

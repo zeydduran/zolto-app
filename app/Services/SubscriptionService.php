@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Services\Responses\Subscription\CardList;
 use App\Services\Responses\Subscription\SubscriptionErrorResponse;
 use App\Services\Responses\Subscription\SubscriptionList;
 use App\Services\Responses\Subscription\SubscriptionSuccessResponse;
@@ -69,6 +70,25 @@ class SubscriptionService
         ]);
         if ($response->ok()) {
             return new SubscriptionSuccessResponse($response->json());
+        }
+        if ($response->badRequest()) {
+            return new SubscriptionErrorResponse($response->json());
+        }
+        throw new \Exception(
+            "Zotlo API request failed: " . $response->status()
+        );
+    }
+
+    public function cardList(
+        string $subscriptionId
+    ): CardList|SubscriptionErrorResponse {
+        $response = Http::zotlo()
+            ->withQueryParameters([
+                "subscriberId" => $subscriptionId,
+            ])
+            ->get("/v1/subscription/card-list");
+        if ($response->ok()) {
+            return new CardList($response->json());
         }
         if ($response->badRequest()) {
             return new SubscriptionErrorResponse($response->json());
