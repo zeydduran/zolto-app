@@ -4,5 +4,5 @@ namespace App\Services\Contracts;
 
 interface ValidationContract
 {
-    public static function validate(array $params): bool;
+    public static function validate(array $params): bool|string;
 }

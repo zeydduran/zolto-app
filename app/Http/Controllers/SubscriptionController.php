@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreSubscriptionRequest;
+use App\Http\Requests\SubscriptionCancellationRequest;
 use App\Http\Requests\UpdateSubscriptionRequest;
 use App\Models\Subscription;
 use App\Services\Facades\ZotloService;
@@ -26,7 +27,7 @@ class SubscriptionController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(StoreSubscriptionRequest $request)
+    public function create()
     {
     }
 
@@ -35,35 +36,48 @@ class SubscriptionController extends Controller
      */
     public function store(StoreSubscriptionRequest $request)
     {
-
-        $user = $request->user()->loadCount(['subscriptions' => function ($query) {
-            $query->where('status', 'active');
-        }]);
+        $user = $request->user()->loadCount([
+            "subscriptions" => function ($query) {
+                $query->where("status", "active");
+            },
+        ]);
         if ($user->subscriptions_count <= 0) {
             $subscriptionId = Str::uuid();
             $params = $request->all();
             $params["subscriberId"] = (string) $subscriptionId;
-            $payment =  ZotloService::payment()->creditCard($params);
+            $payment = ZotloService::payment()->creditCard($params);
             if ($payment instanceof SuccessResponse && $payment->isSuccess()) {
                 /** @var Profile $profile */
                 $profile = $payment->getProfile();
                 $user->subscriptions()->create([
-                    'subscriber_id' => (string) $subscriptionId,
-                    'phone_number'  => $request->input('subscriberPhoneNumber'),
-                    'start_date'    => $profile->startDate,
-                    'expire_date'   => $profile->expireDate,
-                    'status'        => $profile->realStatus,
-                    'packageId'     => $profile->package,
+                    "subscriber_id" => (string) $subscriptionId,
+                    "phone_number" => $request->input("subscriberPhoneNumber"),
+                    "start_date" => $profile->startDate,
+                    "expire_date" => $profile->expireDate,
+                    "status" => $profile->realStatus,
+                    "packageId" => $profile->package,
                 ]);
-                return response()->json(['status' => true, 'subscription' => $profile], 201);
+                return response()->json(
+                    ["status" => true, "subscription" => $profile],
+                    201
+                );
             } else {
-                return response()->json([
-                    'errorCode'    => $payment->getErrorCode(),
-                    'errorMessage' => $payment->getErrorMessage()
-                ], 400);
+                return response()->json(
+                    [
+                        "errorCode" => $payment->getErrorCode(),
+                        "errorMessage" => $payment->getErrorMessage(),
+                    ],
+                    400
+                );
             }
         } else {
-            return response()->json(['errorCode' => 403, 'errorMessage' => trans('Zaten Bir aboneliğiniz mevcut')], 403);
+            return response()->json(
+                [
+                    "errorCode" => 403,
+                    "errorMessage" => trans("Zaten Bir aboneliğiniz mevcut"),
+                ],
+                403
+            );
         }
     }
 
@@ -72,15 +86,20 @@ class SubscriptionController extends Controller
      */
     public function show(Subscription $subscription)
     {
-       
-        $profile =  ZotloService::subscription()->profile($subscription->subscriber_id, 'zotlo.premium');
+        $profile = ZotloService::subscription()->profile(
+            $subscription->subscriber_id,
+            "zotlo.premium"
+        );
         if ($profile instanceof SuccessResponse) {
-            return response()->json($profile);
+            return response()->json($profile, 200);
         } else {
-            return response()->json([
-                'errorCode'    => $profile->getErrorCode(),
-                'errorMessage' => $profile->getErrorMessage()
-            ], 400);
+            return response()->json(
+                [
+                    "errorCode" => $profile->getErrorCode(),
+                    "errorMessage" => $profile->getErrorMessage(),
+                ],
+                400
+            );
         }
     }
 
@@ -95,8 +114,10 @@ class SubscriptionController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateSubscriptionRequest $request, Subscription $subscription)
-    {
+    public function update(
+        UpdateSubscriptionRequest $request,
+        Subscription $subscription
+    ) {
         //
     }
 
@@ -106,5 +127,27 @@ class SubscriptionController extends Controller
     public function destroy(Subscription $subscription)
     {
         //
+    }
+
+    public function cancellation(
+        Subscription $subscription,
+        SubscriptionCancellationRequest $request
+    ) {
+        $cancellation = ZotloService::subscription()->cancellation([
+            "subscriberId" => $subscription->subscriber_id,
+            "cancellationReason" => $request->get("cancellationReason"),
+            "packageId" => $subscription->packageId,
+            "force" => $request->get("force"),
+        ]);
+        if ($cancellation instanceof SuccessResponse) {
+            $subscription->status = "inactive";
+            $subscription->save();
+            return response()->json(
+                $cancellation->getCancellationStatus(),
+                200
+            );
+        } else {
+            return response()->json($cancellation, 400);
+        }
     }
 }

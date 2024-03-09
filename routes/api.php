@@ -17,11 +17,14 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-
-Route::post('signin', [AuthController::class, 'signin']);
-Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/user', function (Request $request) {
+Route::post("signin", [AuthController::class, "signin"]);
+Route::middleware("auth:sanctum")->group(function () {
+    Route::get("/user", function (Request $request) {
         return $request->user();
     });
-    Route::apiResource('subscription', SubscriptionController::class);
+    Route::post("/subscription/cancellation/{subscription}", [
+        SubscriptionController::class,
+        "cancellation",
+    ]);
+    Route::apiResource("subscription", SubscriptionController::class);
 });
