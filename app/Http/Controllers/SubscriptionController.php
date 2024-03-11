@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Dto\SubscriptionChangeDto;
+use App\Http\Middleware\SubscriptionMiddleware;
 use App\Http\Requests\StoreSubscriptionRequest;
 use App\Http\Requests\SubscriptionCancellationRequest;
 use App\Http\Requests\UpdateSubscriptionRequest;
@@ -10,15 +11,16 @@ use App\Http\Resources\SubscriptionResource;
 use App\Jobs\CreateSubscription;
 use App\Models\Subscription;
 use App\Services\Facades\ZotloService;
-use App\Services\Responses\ErrorResponse;
-use App\Services\Responses\Payment\Profile;
-use App\Services\Responses\Subscription\SubscriptionSuccessResponse;
 use App\Services\Responses\SuccessResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Redis;
 
 class SubscriptionController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(SubscriptionMiddleware::class)->only('store');
+    }
     /**
      * Display a listing of the resource.
      */
@@ -45,38 +47,25 @@ class SubscriptionController extends Controller
      */
     public function store(StoreSubscriptionRequest $request)
     {
-        $user = $request->user()->loadCount([
-            "subscriptions" => function ($query) {
-                $query->where("status", "active");
-            },
-        ]);
-        if ($user->subscriptions_count <= 0) {
-            $params = $request->all();
-            $params["ip"] = $request->ip();
-            $params["subscriberPhoneNumber"] = $request->get(
-                "subscriberPhoneNumber"
-            );
-            CreateSubscription::dispatch($user, $params);
-            return response()->json(
-                [
-                    "status" => true,
-                    "message" => trans(
-                        "Abonelik Talebiniz alındı. İşlem gerçekleştiğinde tarafınıza bilgi verilecektir."
-                    ),
-                ],
-                201
-            );
-        } else {
-            return response()->json(
-                [
-                    "errorCode" => 403,
-                    "errorMessage" => trans(
-                        "Zaten aktif bir aboneliğiniz mevcut"
-                    ),
-                ],
-                403
-            );
-        }
+        $user = $request->user();
+        $params = $request->all();
+        $params["ip"] = $request->ip();
+        $params["subscriberPhoneNumber"] = $request->get(
+            "subscriberPhoneNumber"
+        );
+        
+        CreateSubscription::dispatch($user, $params);
+
+
+        return response()->json(
+            [
+                "status" => true,
+                "message" => trans(
+                    "Abonelik Talebiniz alındı. İşlem gerçekleştiğinde tarafınıza bilgi verilecektir."
+                ),
+            ],
+            201
+        );
     }
 
     /**
@@ -140,6 +129,7 @@ class SubscriptionController extends Controller
         if ($cancellation instanceof SuccessResponse) {
             $subscription->status = "inactive";
             $subscription->save();
+            Redis::delete('user:subscription:' . $subscription->user_id);
             return response()->json(
                 $cancellation->getCancellationStatus(),
                 200

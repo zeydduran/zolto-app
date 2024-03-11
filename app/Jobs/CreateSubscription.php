@@ -10,7 +10,9 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Str;
+
 class CreateSubscription implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
@@ -38,7 +40,7 @@ class CreateSubscription implements ShouldQueue
         if ($payment instanceof SuccessResponse && $payment->isSuccess()) {
             /** @var Profile $profile */
             $profile = $payment->getProfile();
-            $this->user->subscriptions()->create([
+            $subscription = $this->user->subscriptions()->create([
                 "subscriber_id" => (string) $subscriptionId,
                 "phone_number" => $this->params["subscriberPhoneNumber"],
                 "start_date" => $profile->startDate,
@@ -46,6 +48,7 @@ class CreateSubscription implements ShouldQueue
                 "status" => $profile->realStatus,
                 "packageId" => $profile->package,
             ]);
+            Redis::set('user:subscription:' . $this->user->id, $subscription);
         }
     }
 }
