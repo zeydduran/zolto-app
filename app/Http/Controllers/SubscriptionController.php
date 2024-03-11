@@ -9,6 +9,7 @@ use App\Http\Requests\SubscriptionCancellationRequest;
 use App\Http\Requests\UpdateSubscriptionRequest;
 use App\Http\Resources\SubscriptionResource;
 use App\Jobs\CreateSubscription;
+use App\Jobs\SubscriberUpdateJob;
 use App\Models\Subscription;
 use App\Services\Facades\ZotloService;
 use App\Services\Responses\SuccessResponse;
@@ -154,5 +155,6 @@ class SubscriptionController extends Controller
     public function hook(Request $request)
     {
         $dto = new SubscriptionChangeDto($request->all());
+        SubscriberUpdateJob::dispatch($dto);
     }
 }
