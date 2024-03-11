@@ -1,0 +1,348 @@
+{
+	"info": {
+		"_postman_id": "34ed90e8-23d9-4900-849e-80b55c681c2e",
+		"name": "zotlo",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "6310898"
+	},
+	"item": [
+		{
+			"name": "User List",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "localhost/api/user",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"api",
+						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Signin",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"lonnie29@example.com\",\r\n    \"password\": \"password\"\r\n}"
+				},
+				"url": {
+					"raw": "localhost/api/signin",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"api",
+						"signin"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Subscription",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "12|zolto_appleg3cPibjSSqkF4KQYFY793Tn9DgD4vzf5XqHYEKa244dc52",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"cardNo\": \"4111111111111111\",\r\n    \"cardOwner\": \"Test Test\",\r\n    \"expireMonth\": \"12\",\r\n    \"expireYear\": \"27\",\r\n    \"cvv\": \"000\",\r\n    \"language\": \"ru\",\r\n    \"packageId\": \"zotlo.premium\",\r\n    \"packageCountry\": \"TR\",\r\n    \"platform\": \"IOS\",\r\n    \"cardToken\": \"\",\r\n    \"subscriberPhoneNumber\": \"+905555555555\",\r\n    \"subscriberFirstname\": \"Karolann\",\r\n    \"subscriberLastname\": \"Smitham\",\r\n    \"subscriberEmail\": \"Sally.Effertz62@yahoo.com\",\r\n    \"subscriberId\": \"510d8f57-05ef-4971-8246-3cdf4249636d\",\r\n    \"subscriberIpAddress\": \"176.234.132.188\",\r\n    \"subscriberCountry\": \"TR\",\r\n    \"transactionSource\": \"\",\r\n    \"installment\":1,\r\n    \"quantity\": 1,\r\n    \"force3ds\": 0,\r\n    \"useWallet\": false,\r\n    \"discountPercent\": 0,\r\n    \"redirectUrl\": \"https://example.com\",\r\n    \"customParameters\": {}\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost/api/subscription",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"api",
+						"subscription"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Show Subscription",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "1|zolto_appYwLlIp2diIerr0urzZ1RilaI06hP9Ii7R0jALb8r8bcf3c65",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "localhost/api/subscription/cfd4bbb3-c813-438e-b603-de3469ad1fb9",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"api",
+						"subscription",
+						"cfd4bbb3-c813-438e-b603-de3469ad1fb9"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Cancellation Subscription",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "16|zolto_appoWyosmRjRhhu3qEapgzJhme4xSofkQbg3iejKsEd7ad78557",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"cancellationReason\": \"test test\",\r\n    \"force\": 0\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost/api/subscription/cancellation/c21d7f5f-d599-4a69-88f3-9133e013482f",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"api",
+						"subscription",
+						"cancellation",
+						"c21d7f5f-d599-4a69-88f3-9133e013482f"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Subscription Card List",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "17|zolto_appiWnsB7wUpSB5Gp4bzM9A6kLRUDDlMhkdnY81sncAb6d5b01f",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"cancellationReason\": \"test test\",\r\n    \"force\": 1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost/api/subscription/card-list/c21d7f5f-d599-4a69-88f3-9133e013482f",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"api",
+						"subscription",
+						"card-list",
+						"c21d7f5f-d599-4a69-88f3-9133e013482f"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Subscription Hook",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "16|zolto_appoWyosmRjRhhu3qEapgzJhme4xSofkQbg3iejKsEd7ad78557",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"queue\": {\r\n        \"type\": \"SubscriberUpdate\",\r\n        \"eventType\": \"newSubscriber\",\r\n        \"requestID\": \"1721a221-f646-4d41-955b-91a35d630920\",\r\n        \"createDate\": {\r\n            \"date\": \"2023-11-14 01:22:11.888000\",\r\n            \"timezone_type\": 3,\r\n            \"timezone\": \"UTC\"\r\n        },\r\n        \"appId\": 1\r\n    },\r\n    \"parameters\": {\r\n        \"profile\": {\r\n            \"status\": \"active\",\r\n            \"realStatus\": \"active\",\r\n            \"subscriberId\": \"01e98f24-9e84-4233-b06a-e3d0b1f6c269\",\r\n            \"subscriptionId\": 1000,\r\n            \"subscriptionType\": \"paid\",\r\n            \"startDate\": \"2023-08-24 01:21:46\",\r\n            \"expireDate\": \"2023-11-30 01:21:46\",\r\n            \"renewalDate\": \"2023-11-30 01:21:46\",\r\n            \"package\": \"premium.package\",\r\n            \"country\": \"TR\",\r\n            \"phoneNumber\": \"+905555555555\",\r\n            \"language\": \"tr\",\r\n            \"originalTransactionId\": \"6e7f48f3-6856-4239-a276-f452a8395f1a\",\r\n            \"lastTransactionId\": \"6e7f48f3-6856-4239-a276-f452a8395f1a\",\r\n            \"subscriptionPackageType\": \"single\",\r\n            \"cancellation\": null,\r\n            \"customParameters\": {},\r\n            \"quantity\": 1,\r\n            \"pendingQuantity\": 0\r\n        },\r\n        \"package\": {\r\n            \"packageId\": \"premium.package\",\r\n            \"price\": 99,\r\n            \"currency\": \"TRY\",\r\n            \"packageType\": \"subscription\",\r\n            \"name\": \"Premium Package\",\r\n            \"subscriptionPackageType\": \"single\",\r\n            \"bundlePackages\": []\r\n        },\r\n        \"newPackage\": null,\r\n        \"card\": {\r\n            \"cardNumber\": \"411111****1111\",\r\n            \"expireDate\": \"06/30\"\r\n        },\r\n        \"customer\": null\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost/api/subscription/hook",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"api",
+						"subscription",
+						"hook"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Subscription List",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "1|zolto_appCRpDSxqrQecbsfKIWRjOjH5343PZT3oaZqZA2nL1658a5f86",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "localhost/api/subscription",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"api",
+						"subscription"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

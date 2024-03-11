@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\SubscriptionController;
+use App\Http\Controllers\UserController;
 use App\Services\Facades\ZotloService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -16,12 +17,11 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
-
-Route::post("signin", [AuthController::class, "signin"]);
+Route::apiResource("user", UserController::class);
+Route::post("/signin", [AuthController::class, "signin"]);
+Route::post("/subscription/hook", [SubscriptionController::class, "hook"]);
 Route::middleware("auth:sanctum")->group(function () {
-    Route::get("/user", function (Request $request) {
-        return $request->user();
-    });
+   
     Route::post("/subscription/cancellation/{subscription}", [
         SubscriptionController::class,
         "cancellation",

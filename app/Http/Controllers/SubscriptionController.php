@@ -2,15 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Dto\SubscriptionChangeDto;
 use App\Http\Requests\StoreSubscriptionRequest;
 use App\Http\Requests\SubscriptionCancellationRequest;
 use App\Http\Requests\UpdateSubscriptionRequest;
+use App\Http\Resources\SubscriptionResource;
+use App\Jobs\CreateSubscription;
 use App\Models\Subscription;
 use App\Services\Facades\ZotloService;
 use App\Services\Responses\ErrorResponse;
 use App\Services\Responses\Payment\Profile;
 use App\Services\Responses\Subscription\SubscriptionSuccessResponse;
 use App\Services\Responses\SuccessResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class SubscriptionController extends Controller
@@ -18,10 +22,15 @@ class SubscriptionController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        // $subscriptionList = ZotloService::subscription()->list($subscription->subscriber_id);
-        // dd($subscriptionList->getResult());
+        $subscriptions = Subscription::when($request->has("user_id"), function (
+            $query
+        ) use ($request) {
+            $query->where("user_id", $request->get("user_id"));
+        })->paginate();
+
+        return SubscriptionResource::collection($subscriptions);
     }
 
     /**
@@ -42,39 +51,28 @@ class SubscriptionController extends Controller
             },
         ]);
         if ($user->subscriptions_count <= 0) {
-            $subscriptionId = Str::uuid();
             $params = $request->all();
-            $params["subscriberId"] = (string) $subscriptionId;
-            $payment = ZotloService::payment()->creditCard($params);
-            if ($payment instanceof SuccessResponse && $payment->isSuccess()) {
-                /** @var Profile $profile */
-                $profile = $payment->getProfile();
-                $user->subscriptions()->create([
-                    "subscriber_id" => (string) $subscriptionId,
-                    "phone_number" => $request->input("subscriberPhoneNumber"),
-                    "start_date" => $profile->startDate,
-                    "expire_date" => $profile->expireDate,
-                    "status" => $profile->realStatus,
-                    "packageId" => $profile->package,
-                ]);
-                return response()->json(
-                    ["status" => true, "subscription" => $profile],
-                    201
-                );
-            } else {
-                return response()->json(
-                    [
-                        "errorCode" => $payment->getErrorCode(),
-                        "errorMessage" => $payment->getErrorMessage(),
-                    ],
-                    400
-                );
-            }
+            $params["ip"] = $request->ip();
+            $params["subscriberPhoneNumber"] = $request->get(
+                "subscriberPhoneNumber"
+            );
+            CreateSubscription::dispatch($user, $params);
+            return response()->json(
+                [
+                    "status" => true,
+                    "message" => trans(
+                        "Abonelik Talebiniz alındı. İşlem gerçekleştiğinde tarafınıza bilgi verilecektir."
+                    ),
+                ],
+                201
+            );
         } else {
             return response()->json(
                 [
                     "errorCode" => 403,
-                    "errorMessage" => trans("Zaten Bir aboneliğiniz mevcut"),
+                    "errorMessage" => trans(
+                        "Zaten aktif bir aboneliğiniz mevcut"
+                    ),
                 ],
                 403
             );
@@ -158,8 +156,13 @@ class SubscriptionController extends Controller
         );
         if ($cardList instanceof SuccessResponse) {
             return response()->json($cardList->getResult());
-        }else{
-             return response()->json($cardList, 400);
+        } else {
+            return response()->json($cardList, 400);
         }
+    }
+
+    public function hook(Request $request)
+    {
+        $dto = new SubscriptionChangeDto($request->all());
     }
 }
